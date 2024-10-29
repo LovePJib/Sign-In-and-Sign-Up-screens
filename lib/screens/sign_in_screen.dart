@@ -1,16 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:todolist_app/components/my_textformfield.dart';
 import 'package:todolist_app/constant/constant.dart';
 import 'package:todolist_app/screens/home_page.dart';
 import 'package:todolist_app/screens/sign_up_screen.dart';
-
-
 import '../components/my_button.dart';
 import '../components/my_icon_btn.dart';
-
 import 'package:firebase_auth/firebase_auth.dart';
 
 class SignInScreen extends StatefulWidget {
@@ -24,8 +20,8 @@ class _SignInScreenState extends State<SignInScreen> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
-  void _showDialog(String txtMsg) async {
-    return showDialog(
+  void _showDialog(String txtMsg, {bool isSuccess = false}) {
+    showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -36,11 +32,12 @@ class _SignInScreenState extends State<SignInScreen> {
             TextButton(
               onPressed: () {
                 Navigator.pop(context); // Close the dialog
-                // Navigate to index.dart if the login is successful
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => ToDoListPage()), // Replace with your index screen widget
-                );
+                if (isSuccess) {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => ToDoListPage()),
+                  );
+                }
               },
               child: const Text('OK'),
             ),
@@ -50,7 +47,6 @@ class _SignInScreenState extends State<SignInScreen> {
     );
   }
 
-  // Function SignInUser
   void signInUser() async {
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
@@ -58,7 +54,7 @@ class _SignInScreenState extends State<SignInScreen> {
         password: passwordController.text.trim(),
       );
 
-      _showDialog('Login successfully!'); // Show the success dialog
+      _showDialog('Login successfully!', isSuccess: true); // Show the success dialog
     } on FirebaseAuthException catch (e) {
       _showDialog("Failed to login! ${e.message}"); // Show error message
     }
